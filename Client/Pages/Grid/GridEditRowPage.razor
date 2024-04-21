@@ -1,0 +1,66 @@
+﻿@page "/Grids/EditRow"
+@using DevExpress.Client.Services
+@using DevExpress.Shared.VMs
+@inject ICustomerClient CustomerClient
+
+<div class="d-flex mb-3">
+    <h3 class="mb-0">Grid - EditRow</h3>
+    <button class="btn btn-primary ms-auto" @onclick="Reload">Refresh</button>
+</div>
+<DxGrid Data="@Data" @ref="Grid" PagerNavigationMode="PagerNavigationMode.Auto" ShowGroupPanel="true" ShowFilterRow="true" EditMode="GridEditMode.EditRow" EditModelSaving="OnEditModelSaving">
+    <Columns>
+        <DxGridCommandColumn Width="150px" />
+        <DxGridDataColumn Caption="#" ReadOnly FieldName="@nameof(DimCustomerVM.CustomerKey)" />
+        <DxGridDataColumn Caption="Key" FieldName="@nameof(DimCustomerVM.GeographyKey)" />
+        <DxGridDataColumn FieldName="@nameof(DimCustomerVM.FullName)" />
+        <DxGridDataColumn FieldName="@nameof(DimCustomerVM.BirthDate)" DisplayFormat="d/M/yyyy" />
+        <DxGridDataColumn FieldName="@nameof(DimCustomerVM.YearlyIncome)" DisplayFormat="C" />
+        <DxGridDataColumn FieldName="@nameof(DimCustomerVM.MaritalStatus)">
+            <CellDisplayTemplate>
+                @{
+                    var customer = context.DataItem as DimCustomerVM;
+                }
+                <span>@(customer?.MaritalStatus == 'M' ? "Marid" : "Single")</span>
+            </CellDisplayTemplate>
+        </DxGridDataColumn>
+        <DxGridDataColumn Width="70px" FieldName="@nameof(DimCustomerVM.Gender)">
+            <CellDisplayTemplate>
+                @{
+                    var customer = context.DataItem as DimCustomerVM;
+                }
+                <span>@(customer?.Gender == "M" ? "Mail" : "Femail")</span>
+            </CellDisplayTemplate>
+        </DxGridDataColumn>
+    </Columns>
+    <TotalSummary>
+        <DxGridSummaryItem FieldName="@nameof(DimCustomerVM.CustomerKey)"
+                           SummaryType=GridSummaryItemType.Count />
+        <DxGridSummaryItem FieldName="@nameof(DimCustomerVM.YearlyIncome)"
+                           SummaryType=GridSummaryItemType.Avg
+                           ValueDisplayFormat="C" />
+    </TotalSummary>
+</DxGrid>
+
+@code {
+    List<DimCustomerVM> Data { get; set; }
+    IGrid Grid;
+    protected override async Task OnInitializedAsync()
+    {
+        Data = await CustomerClient.GetDimCustomer();
+    }
+
+    async Task Reload()
+    {
+        Data = await CustomerClient.GetDimCustomer();
+    }
+
+    async Task OnEditModelSaving(GridEditModelSavingEventArgs args)
+    {
+        var item = args.EditModel as DimCustomerVM;
+        if (item != null)
+        {
+            await CustomerClient.PutDimCustomer(item.CustomerKey, item);
+            await Reload();
+        }
+    }
+}

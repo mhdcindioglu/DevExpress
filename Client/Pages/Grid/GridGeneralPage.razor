@@ -1,0 +1,50 @@
+﻿@page "/Grids/General"
+@using DevExpress.Client.Services
+@using DevExpress.Shared.VMs
+@inject ICustomerClient CustomerClient
+
+<div class="d-flex mb-3">
+    <h3 class="mb-0">Grid</h3>
+    <button class="btn btn-primary ms-auto" @onclick="Reload">Refresh</button>
+</div>
+<DxGrid Data="@Data" @ref="Grid" AllowGroup="false" AllowColumnReorder="false" AllowSort="false">
+    <Columns>
+        <DxGridDataColumn Caption="#" Width="70px" FieldName="@nameof(DimCustomerVM.CustomerKey)" />
+        <DxGridDataColumn Caption="Key" Width="70px" FieldName="@nameof(DimCustomerVM.GeographyKey)" />
+        <DxGridDataColumn FieldName="@nameof(DimCustomerVM.FullName)" />
+        <DxGridDataColumn Width="90px" FieldName="@nameof(DimCustomerVM.BirthDate)" DisplayFormat="d/M/yyyy" />
+        <DxGridDataColumn Width="100px" FieldName="@nameof(DimCustomerVM.YearlyIncome)" DisplayFormat="C" />
+        <DxGridDataColumn Width="70px" FieldName="@nameof(DimCustomerVM.MaritalStatus)">
+            @* GroupIndex="0" *@
+            <CellDisplayTemplate>
+                @{
+                    var customer = context.DataItem as DimCustomerVM;
+                }
+                <span>@(customer?.MaritalStatus == 'M' ? "Marid" : "Single")</span>
+            </CellDisplayTemplate>
+        </DxGridDataColumn>
+        <DxGridDataColumn Width="70px" FieldName="@nameof(DimCustomerVM.Gender)">
+            @* GroupIndex="1" *@
+            <CellDisplayTemplate>
+                @{
+                    var customer = context.DataItem as DimCustomerVM;
+                }
+                <span>@(customer?.Gender == "M" ? "Mail" : "Femail")</span>
+            </CellDisplayTemplate>
+        </DxGridDataColumn>
+    </Columns>
+</DxGrid>
+
+@code {
+    List<DimCustomerVM> Data { get; set; }
+    IGrid Grid;
+    protected override async Task OnInitializedAsync()
+    {
+        Data = await CustomerClient.GetDimCustomer();
+    }
+
+    void Reload()
+    {
+        Grid.Reload();
+    }
+}

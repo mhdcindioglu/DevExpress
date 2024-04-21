@@ -1,0 +1,81 @@
+﻿@page "/Grids/Pagining"
+@using DevExpress.Client.Services
+@using DevExpress.Shared.VMs
+@inject ICustomerClient CustomerClient
+
+<div class="d-flex mb-3">
+    <h3 class="mb-0">Grids - Pagining</h3>
+    <button class="btn btn-primary ms-auto" @onclick="Reload">Refresh</button>
+</div>
+<p class="mb-0">1. Show all rows</p>
+<span>@("<DxGrid Data=\"@Data\" @ref=\"Grid\" ")</span><span class="text-danger">@("ShowAllRows=\"true\" style=\"height: 300px; \"")</span><span>@(">")</span>
+<DxGrid Data="@Data" @ref="Grid" ShowAllRows="true" style="height: 300px;">
+    <Columns>
+        <DxGridDataColumn Caption="#" Width="70px" FieldName="@nameof(DimCustomerVM.CustomerKey)" />
+        <DxGridDataColumn Caption="Key" Width="70px" FieldName="@nameof(DimCustomerVM.GeographyKey)" />
+        <DxGridDataColumn FieldName="@nameof(DimCustomerVM.FullName)" />
+        <DxGridDataColumn Width="90px" FieldName="@nameof(DimCustomerVM.BirthDate)" DisplayFormat="d/M/yyyy" />
+        <DxGridDataColumn Width="100px" FieldName="@nameof(DimCustomerVM.YearlyIncome)" DisplayFormat="C" />
+    </Columns>
+</DxGrid>
+<br />
+
+<p class="mb-0">2. Show 10 rows and pager up and down</p>
+<span>@("<DxGrid Data=\"@Data\" @ref=\"Grid\" ")</span><span class="text-danger">@("PageSize=\"10\" PagerPosition=\"GridPagerPosition.TopAndBottom\"")</span><span>@(">")</span>
+<DxGrid Data="@Data" @ref="Grid" PageSize="10" PagerPosition="GridPagerPosition.TopAndBottom">
+    <Columns>
+        <DxGridDataColumn Caption="#" Width="70px" FieldName="@nameof(DimCustomerVM.CustomerKey)" />
+        <DxGridDataColumn Caption="Key" Width="70px" FieldName="@nameof(DimCustomerVM.GeographyKey)" />
+        <DxGridDataColumn FieldName="@nameof(DimCustomerVM.FullName)" />
+        <DxGridDataColumn Width="90px" FieldName="@nameof(DimCustomerVM.BirthDate)" DisplayFormat="d/M/yyyy" />
+        <DxGridDataColumn Width="100px" FieldName="@nameof(DimCustomerVM.YearlyIncome)" DisplayFormat="C" />
+    </Columns>
+</DxGrid>
+<br />
+
+<p class="mb-0">3. Show 10 rows and buttoms pager up 5 buttoms</p>
+<span>@("<DxGrid Data=\"@Data\" @ref=\"Grid\" ")</span><span class="text-danger">@("PageSize=\"10\" PagerNavigationMode=\"PagerNavigationMode.NumericButtons\" PagerVisibleNumericButtonCount=\"5\" PagerAutoHideNavButtons=\"true\"")</span><span>@(">")</span>
+<DxGrid Data="@Data" @ref="Grid" PagerNavigationMode="PagerNavigationMode.NumericButtons" PagerVisibleNumericButtonCount="5" PagerAutoHideNavButtons="true">
+    <Columns>
+        <DxGridDataColumn Caption="#" Width="70px" FieldName="@nameof(DimCustomerVM.CustomerKey)" />
+        <DxGridDataColumn Caption="Key" Width="70px" FieldName="@nameof(DimCustomerVM.GeographyKey)" />
+        <DxGridDataColumn FieldName="@nameof(DimCustomerVM.FullName)" />
+        <DxGridDataColumn Width="90px" FieldName="@nameof(DimCustomerVM.BirthDate)" DisplayFormat="d/M/yyyy" />
+        <DxGridDataColumn Width="100px" FieldName="@nameof(DimCustomerVM.YearlyIncome)" DisplayFormat="C" />
+    </Columns>
+</DxGrid>
+<br />
+
+<p class="mb-0">4. show buttons if pages &le; 10 and normal pager if else (to test change page rows size from 100 to 50)</p>
+<span>@("<DxGrid Data=\"@Data\" @ref=\"Grid\" ")</span>
+<br />
+<span class="text-danger ms-5">@("PageSize=\"100\" PageSizeSelectorVisible=\"true\" PageSizeSelectorAllRowsItemVisible=\"true\"")</span>
+<br />
+<span class="text-danger ms-5">@("PageSizeSelectorItems=\"@(new int[] { 5, 10, 25, 50, 100})\" PagerNavigationMode=\"PagerNavigationMode.Auto\"")</span>
+<br />
+<span class="text-danger ms-5">@("PagerVisibleNumericButtonCount=\"5\" PagerAutoHideNavButtons=\"true\" style=\"height: 300px;\"")</span>
+<span>@(">")</span>
+<DxGrid Data="@Data" @ref="Grid" PageSize="100" PageSizeSelectorVisible="true" PageSizeSelectorAllRowsItemVisible="true"
+        PageSizeSelectorItems="@(new int[] { 5, 10, 25, 50, 100})" PagerNavigationMode="PagerNavigationMode.Auto"
+        PagerVisibleNumericButtonCount="5" PagerAutoHideNavButtons="true" style="height: 300px;">
+    <Columns>
+        <DxGridDataColumn Caption="#" Width="70px" FieldName="@nameof(DimCustomerVM.CustomerKey)" />
+        <DxGridDataColumn Caption="Key" Width="70px" FieldName="@nameof(DimCustomerVM.GeographyKey)" />
+        <DxGridDataColumn FieldName="@nameof(DimCustomerVM.FullName)" />
+        <DxGridDataColumn Width="90px" FieldName="@nameof(DimCustomerVM.BirthDate)" DisplayFormat="d/M/yyyy" />
+        <DxGridDataColumn Width="100px" FieldName="@nameof(DimCustomerVM.YearlyIncome)" DisplayFormat="C" />
+    </Columns>
+</DxGrid>
+@code {
+    List<DimCustomerVM> Data { get; set; }
+    IGrid Grid;
+    protected override async Task OnInitializedAsync()
+    {
+        Data = await CustomerClient.GetDimCustomer();
+    }
+
+    void Reload()
+    {
+        Grid.Reload();
+    }
+}
